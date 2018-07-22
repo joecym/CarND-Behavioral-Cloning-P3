@@ -44,7 +44,7 @@ My model consists of a convolution neural network with 2x2 filter sizes and dept
 
 Here is the architecture:
 
-''' python
+``` python
 model = Sequential()
 model.add(Lambda(lambda x: x/255.0 - 0.5, input_shape = (160,320,3)))
 model.add(Cropping2D(cropping=((70,25),(0,0))))
@@ -62,8 +62,7 @@ model.add(Dense(1))
 
 model.compile(loss='mse', optimizer='adam')
 model.fit(X_train,y_train,validation_split=0.15,shuffle=True,nb_epoch=10)
-'''
-
+```
 #### 2. Attempts to reduce overfitting in the model
 
 The model contains dropout layers in order to reduce overfitting (model.py lines 21). 
