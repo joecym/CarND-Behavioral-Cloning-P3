@@ -28,7 +28,6 @@ for line in lines:
     steering_right = steering_center - correction
 
     # add images and angles to data set
-    #images.extend(img_center, img_left, img_right)
     images.append(img_center)
     images.append(img_left)
     images.append(img_right)
