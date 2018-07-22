@@ -75,60 +75,79 @@ The model used an adam optimizer, so the learning rate was not tuned manually (m
 
 #### 4. Appropriate training data
 
-Training data was chosen to keep the vehicle driving on the road. I used a combination of center lane driving, recovering from the left and right sides of the road ... 
-
-For details about how I created the training data, see the next section. 
+Training data was chosen to keep the vehicle driving on the road. I trained entirely on the first track, but drove several laps in both directions. I also collected more images around the corners that were giving the car trouble.
 
 ### Model Architecture and Training Strategy
 
 #### 1. Solution Design Approach
 
-The overall strategy for deriving a model architecture was to ...
+The overall strategy for deriving a model architecture was to adjust and tune the NVIDIA model outlined in the previous video. At first, I combined my data with the test data set provided by Udacity, but I found my model performing worse. I seemed to do better with less data that was entirely my own.
 
-My first step was to use a convolution neural network model similar to the ... I thought this model might be appropriate because ...
+I augmented my data by flipping the images, performed a normalization, and also adjusted the steering angle for the left and right camera images by 0.15.
 
-In order to gauge how well the model was working, I split my image and steering angle data into a training and validation set. I found that my first model had a low mean squared error on the training set but a high mean squared error on the validation set. This implied that the model was overfitting. 
+I used a convolution neural network model similar to the NVIDIA model. I thought this model might be appropriate because it works! I added a dropout layer after the convolutional layers, but otherwise, it is the same.
 
-To combat the overfitting, I modified the model so that ...
+It still seemed like my model was overfitting, because my validation error increased. Here is the output of my command window:
 
-Then I ... 
+``` sh
+Train on 31308 samples, validate on 5526 samples
+Epoch 1/10
+2018-07-22 21:21:43.237910: W tensorflow/core/platform/cpu_feature_guard.cc:45] The TensorFlow library wasn't compiled to use SSE4.1 instructions, but these are available on your machine and could speed up CPU computations.
+2018-07-22 21:21:43.237981: W tensorflow/core/platform/cpu_feature_guard.cc:45] The TensorFlow library wasn't compiled to use SSE4.2 instructions, but these are available on your machine and could speed up CPU computations.
+2018-07-22 21:21:43.237993: W tensorflow/core/platform/cpu_feature_guard.cc:45] The TensorFlow library wasn't compiled to use AVX instructions, but these are available on your machine and could speed up CPU computations.
+2018-07-22 21:21:43.238000: W tensorflow/core/platform/cpu_feature_guard.cc:45] The TensorFlow library wasn't compiled to use AVX2 instructions, but these are available on your machine and could speed up CPU computations.
+2018-07-22 21:21:43.238007: W tensorflow/core/platform/cpu_feature_guard.cc:45] The TensorFlow library wasn't compiled to use FMA instructions, but these are available on your machine and could speed up CPU computations.
+2018-07-22 21:21:43.325887: I tensorflow/stream_executor/cuda/cuda_gpu_executor.cc:893] successful NUMA node read from SysFS had negative value (-1), but there must be at least one NUMA node, so returning NUMA node zero
+2018-07-22 21:21:43.326265: I tensorflow/core/common_runtime/gpu/gpu_device.cc:955] Found device 0 with properties:
+name: Tesla K80
+major: 3 minor: 7 memoryClockRate (GHz) 0.8235
+pciBusID 0000:00:04.0
+Total memory: 11.17GiB
+Free memory: 11.09GiB
+2018-07-22 21:21:43.326313: I tensorflow/core/common_runtime/gpu/gpu_device.cc:976] DMA: 0
+2018-07-22 21:21:43.326338: I tensorflow/core/common_runtime/gpu/gpu_device.cc:986] 0:   Y
+2018-07-22 21:21:43.326357: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1045] Creating TensorFlow device (/gpu:0)-> (device: 0, name: Tesla K80, pci bus id: 0000:00:04.0)
+31308/31308 [==============================] - 35s - loss: 0.0383 - val_loss: 0.0521
+Epoch 2/10
+31308/31308 [==============================] - 33s - loss: 0.0353 - val_loss: 0.0536
+Epoch 3/10
+31308/31308 [==============================] - 33s - loss: 0.0340 - val_loss: 0.0501
+Epoch 4/10
+31308/31308 [==============================] - 33s - loss: 0.0324 - val_loss: 0.0491
+Epoch 5/10
+31308/31308 [==============================] - 33s - loss: 0.0309 - val_loss: 0.0531
+Epoch 6/10
+31308/31308 [==============================] - 33s - loss: 0.0297 - val_loss: 0.0535
+Epoch 7/10
+31308/31308 [==============================] - 33s - loss: 0.0280 - val_loss: 0.0562
+Epoch 8/10
+31308/31308 [==============================] - 33s - loss: 0.0266 - val_loss: 0.0535
+Epoch 9/10
+31308/31308 [==============================] - 33s - loss: 0.0251 - val_loss: 0.0587
+Epoch 10/10
+31308/31308 [==============================] - 33s - loss: 0.0232 - val_loss: 0.0626
+```
 
-The final step was to run the simulator to see how well the car was driving around track one. There were a few spots where the vehicle fell off the track... to improve the driving behavior in these cases, I ....
+To combat the overfitting, I tried fewer epochs, as low as three. However, I found that the car performed better with more epochs, even though my validation loss kept increasing. 
 
-At the end of the process, the vehicle is able to drive autonomously around the track without leaving the road.
+The final step was to run the simulator to see how well the car was driving around track one. There were a few spots where the vehicle fell off the track, especially the second curve after the bridge. To improve the driving behavior in these cases, I took more data around these curves and adjusted the steering adjustment. I also tried adjusting the layers in the network, but I didn't see any improvement there. 
+
+At the end of the process, the vehicle is able to drive autonomously around the track without leaving the road. I was even able to incease the speed to 15mph. I tried up to 30mph, because this is the speed I was going when training. However, the steering would oscillate at speeds higher than 15 mph and move off the track.
 
 #### 2. Final Model Architecture
 
-The final model architecture (model.py lines 18-24) consisted of a convolution neural network with the following layers and layer sizes ...
+The final model architecture is the same as listed above.
 
-Here is a visualization of the architecture (note: visualizing the architecture is optional according to the project rubric)
-
-![alt text][image1]
 
 #### 3. Creation of the Training Set & Training Process
 
-To capture good driving behavior, I first recorded two laps on track one using center lane driving. Here is an example image of center lane driving:
+To capture good driving behavior, I first recorded two laps on track, and tried to just stay on the track as best I could. I found the keyboard controls a bit challenging at first.
 
-![alt text][image2]
+Then I repeated this process on the same track in the opposite direction.
 
-I then recorded the vehicle recovering from the left side and right sides of the road back to center so that the vehicle would learn to .... These images show what a recovery looks like starting from ... :
+To augment the data sat, I also flipped images and angles thinking that this would provide a more balanced learning set.
 
-![alt text][image3]
-![alt text][image4]
-![alt text][image5]
-
-Then I repeated this process on track two in order to get more data points.
-
-To augment the data sat, I also flipped images and angles thinking that this would ... For example, here is an image that has then been flipped:
-
-![alt text][image6]
-![alt text][image7]
-
-Etc ....
-
-After the collection process, I had X number of data points. I then preprocessed this data by ...
+After the collection process, I had 18,417 number of data points. After processing the data, and segregating the data set, my training set had 31,308 samples.
 
 
-I finally randomly shuffled the data set and put Y% of the data into a validation set. 
-
-I used this training data for training the model. The validation set helped determine if the model was over or under fitting. The ideal number of epochs was Z as evidenced by ... I used an adam optimizer so that manually training the learning rate wasn't necessary.
+I finally randomly shuffled the data set and put 15% of the data into a validation set. 
