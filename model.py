@@ -87,4 +87,4 @@ model.compile(loss='mse', optimizer='adam')
 model.fit(X_train,y_train,validation_split=0.15,shuffle=True,nb_epoch=10)
 
 #save the model
-model.save('model2.h5')
+model.save('model.h5')
