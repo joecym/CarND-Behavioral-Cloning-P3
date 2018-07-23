@@ -1,6 +1,14 @@
+
 # **Behavioral Cloning**
 # Joe Cymerman
 # 22 July 2018
+
+[//]: # (Image References)
+
+[image1]: ./center_2018_07_21_20_07_35_723.jpg  "Center Image"
+[image2]: ./left_2018_07_21_20_07_35_723.jpg  "Left Image"
+[image3]: ./right_2018_07_21_20_07_35_723.jpg  "Right Image"
+
 ---
 **Behavioral Cloning Project**
 
@@ -20,6 +28,7 @@ The goals / steps of this project are the following:
 #### 1. Submission includes all required files and can be used to run the simulator in autonomous mode
 
 My project includes the following files:
+
 * model.py containing the script to create and train the model
 * drive.py for driving the car in autonomous mode
 * model.h5 containing a trained convolution neural network 
@@ -40,7 +49,7 @@ The model.py file contains the code for training and saving the convolution neur
 
 #### 1. An appropriate model architecture has been employed
 
-My model consists of a convolution neural network with 2x2 filter sizes and depths between 24 and 64 (model.py lines 62-75). This was the same network shown in the video by NVIDIA.  
+My model consists of a convolution neural network with 2x2 filter sizes and depths between 24 and 64 (model.py lines 62-75). This was the same network shown in the video by NVIDIA.  I added the 'tanh' activation function to the fully connected layers to introduce non-linearities.
 
 Here is the architecture:
 
@@ -55,10 +64,10 @@ model.add(Convolution2D(64,3,3,activation='relu'))
 model.add(Convolution2D(64,3,3,activation='relu'))
 model.add(Dropout(0.5))
 model.add(Flatten())
-model.add(Dense(100))
-model.add(Dense(50))
-model.add(Dense(10))
-model.add(Dense(1))
+model.add(Dense(100,activation='tanh'))
+model.add(Dense(50,activation='tanh'))
+model.add(Dense(10,activation='tanh'))
+model.add(Dense(1,activation='tanh'))
 
 model.compile(loss='mse', optimizer='adam')
 model.fit(X_train,y_train,validation_split=0.15,shuffle=True,nb_epoch=10)
@@ -77,6 +86,12 @@ The model used an adam optimizer, so the learning rate was not tuned manually (m
 
 Training data was chosen to keep the vehicle driving on the road. I trained entirely on the first track, but drove several laps in both directions. I also collected more images around the corners that were giving the car trouble.
 
+Here are example images from my data set. I used all images available (center, left, and right images):
+
+![alt text][image1]
+![alt text][image2]
+![alt text][image3]
+
 ### Model Architecture and Training Strategy
 
 #### 1. Solution Design Approach
@@ -87,52 +102,13 @@ I augmented my data by flipping the images, performed a normalization, and also 
 
 I used a convolution neural network model similar to the NVIDIA model. I thought this model might be appropriate because it works! I added a dropout layer after the convolutional layers, but otherwise, it is the same.
 
-It still seemed like my model was overfitting, because my validation error increased. Here is the output of my command window:
-
-``` sh
-Train on 31308 samples, validate on 5526 samples
-Epoch 1/10
-2018-07-22 21:21:43.237910: W tensorflow/core/platform/cpu_feature_guard.cc:45] The TensorFlow library wasn't compiled to use SSE4.1 instructions, but these are available on your machine and could speed up CPU computations.
-2018-07-22 21:21:43.237981: W tensorflow/core/platform/cpu_feature_guard.cc:45] The TensorFlow library wasn't compiled to use SSE4.2 instructions, but these are available on your machine and could speed up CPU computations.
-2018-07-22 21:21:43.237993: W tensorflow/core/platform/cpu_feature_guard.cc:45] The TensorFlow library wasn't compiled to use AVX instructions, but these are available on your machine and could speed up CPU computations.
-2018-07-22 21:21:43.238000: W tensorflow/core/platform/cpu_feature_guard.cc:45] The TensorFlow library wasn't compiled to use AVX2 instructions, but these are available on your machine and could speed up CPU computations.
-2018-07-22 21:21:43.238007: W tensorflow/core/platform/cpu_feature_guard.cc:45] The TensorFlow library wasn't compiled to use FMA instructions, but these are available on your machine and could speed up CPU computations.
-2018-07-22 21:21:43.325887: I tensorflow/stream_executor/cuda/cuda_gpu_executor.cc:893] successful NUMA node read from SysFS had negative value (-1), but there must be at least one NUMA node, so returning NUMA node zero
-2018-07-22 21:21:43.326265: I tensorflow/core/common_runtime/gpu/gpu_device.cc:955] Found device 0 with properties:
-name: Tesla K80
-major: 3 minor: 7 memoryClockRate (GHz) 0.8235
-pciBusID 0000:00:04.0
-Total memory: 11.17GiB
-Free memory: 11.09GiB
-2018-07-22 21:21:43.326313: I tensorflow/core/common_runtime/gpu/gpu_device.cc:976] DMA: 0
-2018-07-22 21:21:43.326338: I tensorflow/core/common_runtime/gpu/gpu_device.cc:986] 0:   Y
-2018-07-22 21:21:43.326357: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1045] Creating TensorFlow device (/gpu:0)-> (device: 0, name: Tesla K80, pci bus id: 0000:00:04.0)
-31308/31308 [==============================] - 35s - loss: 0.0383 - val_loss: 0.0521
-Epoch 2/10
-31308/31308 [==============================] - 33s - loss: 0.0353 - val_loss: 0.0536
-Epoch 3/10
-31308/31308 [==============================] - 33s - loss: 0.0340 - val_loss: 0.0501
-Epoch 4/10
-31308/31308 [==============================] - 33s - loss: 0.0324 - val_loss: 0.0491
-Epoch 5/10
-31308/31308 [==============================] - 33s - loss: 0.0309 - val_loss: 0.0531
-Epoch 6/10
-31308/31308 [==============================] - 33s - loss: 0.0297 - val_loss: 0.0535
-Epoch 7/10
-31308/31308 [==============================] - 33s - loss: 0.0280 - val_loss: 0.0562
-Epoch 8/10
-31308/31308 [==============================] - 33s - loss: 0.0266 - val_loss: 0.0535
-Epoch 9/10
-31308/31308 [==============================] - 33s - loss: 0.0251 - val_loss: 0.0587
-Epoch 10/10
-31308/31308 [==============================] - 33s - loss: 0.0232 - val_loss: 0.0626
-```
+It still seemed like my model was overfitting, because my validation error increased. 
 
 To combat the overfitting, I tried fewer epochs, as low as three. However, I found that the car performed better with more epochs, even though my validation loss kept increasing. 
 
 The final step was to run the simulator to see how well the car was driving around track one. There were a few spots where the vehicle fell off the track, especially the second curve after the bridge. To improve the driving behavior in these cases, I took more data around these curves and adjusted the steering adjustment. I also tried adjusting the layers in the network, but I didn't see any improvement there. 
 
-At the end of the process, the vehicle is able to drive autonomously around the track without leaving the road. I was even able to incease the speed to 15mph. I tried up to 30mph, because this is the speed I was going when training. However, the steering would oscillate at speeds higher than 15 mph and move off the track.
+At the end of the process, the vehicle is able to drive autonomously around the track without leaving the road. I was even able to incease the speed to 15mph. I tried up to 30mph, because this is the speed I was going when training. However, the steering would oscillate at speeds higher than 15 mph and move off the track. For my final video, I set the speed to 9mph. 
 
 #### 2. Final Model Architecture
 
@@ -148,6 +124,5 @@ Then I repeated this process on the same track in the opposite direction.
 To augment the data sat, I also flipped images and angles thinking that this would provide a more balanced learning set.
 
 After the collection process, I had 18,417 number of data points. After processing the data, and segregating the data set, my training set had 31,308 samples.
-
 
 I finally randomly shuffled the data set and put 15% of the data into a validation set. 
