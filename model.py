@@ -3,6 +3,10 @@ import csv
 import cv2
 import numpy as np
 import sklearn
+from PIL import Image
+from flask import Flask
+from io import BytesIO
+import base64
 
 lines = []
 images = []
@@ -17,9 +21,13 @@ for line in lines:
     current_path = './data_new'
     
     # read in images from center, left and right cameras
+    # and then convert to BGR to RGB
     img_center = cv2.imread(current_path + line[0])
+    img_center = cv2.cvtColor(img_center, cv2.COLOR_BGR2RGB)
     img_left = cv2.imread(current_path + line[1])
+    img_left = cv2.cvtColor(img_left, cv2.COLOR_BGR2RGB)
     img_right = cv2.imread(current_path + line[2])
+    img_right = cv2.cvtColor(img_right, cv2.COLOR_BGR2RGB)
     steering_center = float(line[3])
    
     # create adjusted steering measurements for the side camera images
@@ -28,6 +36,7 @@ for line in lines:
     steering_right = steering_center - correction
 
     # add images and angles to data set
+    #images.extend(img_center, img_left, img_right)
     images.append(img_center)
     images.append(img_left)
     images.append(img_right)
@@ -69,10 +78,10 @@ model.add(Convolution2D(64,3,3,activation='relu'))
 model.add(Convolution2D(64,3,3,activation='relu'))
 model.add(Dropout(0.5))
 model.add(Flatten())
-model.add(Dense(100))
-model.add(Dense(50))
-model.add(Dense(10))
-model.add(Dense(1))
+model.add(Dense(100,activation='tanh'))
+model.add(Dense(50,activation='tanh'))
+model.add(Dense(10,activation='tanh'))
+model.add(Dense(1,activation='tanh'))
 
 model.compile(loss='mse', optimizer='adam')
 model.fit(X_train,y_train,validation_split=0.15,shuffle=True,nb_epoch=10)
